@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saffron & Root — Smart Restaurant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF8F0;
+    --dark: #241A00;
+    --amber: #F4A300;
+    --amber-dark: #B77400;
+    --green: #2E7D32;
+    --red: #E14434;
+    --card-shadow: 0 2px 10px rgba(36,26,0,0.06);
+    --card-shadow-hover: 0 8px 24px rgba(36,26,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+  /* NAVBAR */
+  .navbar {
+    position: sticky; top: 0; z-index: 30;
+    background: rgba(255,248,240,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(36,26,0,0.06);
+  }
+  .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-badge {
+    width: 32px; height: 32px; border-radius: 10px; background: var(--amber);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: var(--dark);
+  }
+  .logo-text { font-family: 'Sora', sans-serif; font-weight: 700; letter-spacing: -0.3px; }
+  .nav-actions { display: flex; align-items: center; gap: 10px; }
+  .table-chip {
+    display: none; align-items: center; gap: 5px; font-size: 12px; font-weight: 500;
+    color: rgba(36,26,0,0.6); background: rgba(36,26,0,0.05);
+    padding: 6px 12px; border-radius: 999px;
+  }
+  @media (min-width: 640px) { .table-chip { display: flex; } }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 12px; border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    color: rgba(36,26,0,0.7); position: relative; transition: background 0.2s;
+  }
+  .icon-btn:hover { background: rgba(36,26,0,0.05); }
+  .cart-btn { background: var(--dark); color: var(--bg); }
+  .cart-btn:hover { transform: scale(1.05); background: var(--dark); }
+  .cart-count {
+    position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
+    background: var(--red); color: #fff; font-size: 10px; font-weight: 700;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; background: var(--red); border-radius: 50%; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; padding: 12px 0 0; }
+  .tab-btn {
+    font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 999px;
+    border: none; background: transparent; color: rgba(36,26,0,0.4); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { background: var(--dark); color: var(--bg); }
+
+  /* HERO */
+  .hero {
+    position: relative; overflow: hidden; border-radius: 24px;
+    margin: 16px 20px 0; background: linear-gradient(135deg, rgba(36,26,0,0.88), rgba(58,41,0,0.82)),
+      url('https://loremflickr.com/900/500/indianfood,restaurant?lock=999') center/cover;
+    color: var(--bg);
+  }
+  .hero-emoji {
+    position: absolute; font-size: 220px; opacity: 0.08; right: -30px; top: -40px;
+    transform: rotate(12deg); pointer-events: none;
+  }
+  .hero-inner { position: relative; padding: 48px 40px; max-width: 520px; }
+  @media (max-width: 640px) { .hero-inner { padding: 40px 24px; } }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
+    border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .badge-ai { background: linear-gradient(90deg, rgba(244,163,0,0.25), rgba(225,68,52,0.15)); color: #FFD98C; }
+  .hero h1 {
+    font-family: 'Sora', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15;
+    margin-top: 16px;
+  }
+  .hero p { margin-top: 12px; color: rgba(255,248,240,0.7); font-size: 15px; line-height: 1.6; max-width: 420px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 16px;
+    background: var(--amber); color: var(--dark); font-weight: 600; padding: 11px 22px;
+    font-size: 14px; cursor: pointer; box-shadow: 0 4px 14px rgba(244,163,0,0.35);
+    transition: all 0.2s; font-family: inherit;
+  }
+  .btn-primary:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(244,163,0,0.45); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px; border-radius: 16px;
+    background: transparent; border: 1px solid rgba(255,248,240,0.25); color: var(--bg);
+    font-weight: 500; padding: 10px 18px; font-size: 14px; cursor: pointer;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .btn-ghost:hover { background: rgba(255,248,240,0.1); }
+
+  /* SECTIONS */
+  section.block { padding: 40px 20px 0; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-head h2 { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .link-btn { font-size: 12px; font-weight: 500; color: rgba(36,26,0,0.6); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 2px; font-family: inherit;}
+  .link-btn:hover { color: var(--dark); }
+
+  .carousel { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+  .carousel::-webkit-scrollbar { height: 6px; }
+  .carousel::-webkit-scrollbar-thumb { background: rgba(36,26,0,0.15); border-radius: 10px; }
+  .carousel .dish-card { min-width: 220px; scroll-snap-align: start; }
+
+  .highlights { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 40px 20px 24px; }
+  @media (min-width: 640px) { .highlights { grid-template-columns: repeat(3,1fr); } }
+  .highlight-card {
+    border-radius: 18px; background: #fff; border: 1px solid rgba(36,26,0,0.05);
+    padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--card-shadow);
+  }
+  .highlight-icon {
+    width: 40px; height: 40px; border-radius: 12px; background: rgba(244,163,0,0.15);
+    color: var(--amber-dark); display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .highlight-title { font-weight: 700; font-size: 13px; }
+  .highlight-sub { font-size: 11px; color: rgba(36,26,0,0.5); }
+
+  /* MENU PAGE */
+  .menu-page { padding: 24px 20px 60px; max-width: 1000px; margin: 0 auto; }
+  .menu-page h1 { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; }
+  .menu-controls {
+    position: sticky; top: 64px; z-index: 20; background: rgba(255,248,240,0.95);
+    backdrop-filter: blur(10px); margin: 12px -20px 0; padding: 12px 20px;
+    border-bottom: 1px solid rgba(36,26,0,0.05);
+  }
+  .search-row { display: flex; gap: 8px; }
+  .search-wrap { flex: 1; position: relative; }
+  .search-wrap span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; }
+  .search-wrap input {
+    width: 100%; padding: 10px 16px 10px 38px; border-radius: 16px; border: 1px solid rgba(36,26,0,0.1);
+    background: #fff; font-size: 14px; font-family: inherit; outline: none;
+  }
+  .search-wrap input:focus { box-shadow: 0 0 0 3px rgba(244,163,0,0.25); }
+  .filter-toggle {
+    width: 44px; height: 44px; border-radius: 16px; border: 1px solid rgba(36,26,0,0.1);
+    background: #fff; color: rgba(36,26,0,0.6); cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .filter-toggle.active { background: var(--dark); color: var(--bg); border-color: var(--dark); }
+
+  .category-tabs { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; }
+  .cat-btn {
+    white-space: nowrap; padding: 6px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    border: 1px solid rgba(36,26,0,0.1); background: #fff; color: rgba(36,26,0,0.6); cursor: pointer;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .cat-btn.active { background: var(--amber); color: var(--dark); border-color: var(--amber); }
+
+  .diet-filters { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .diet-btn {
+    display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 500; border: 1px solid rgba(36,26,0,0.1); background: #fff;
+    color: rgba(36,26,0,0.6); cursor: pointer; transition: all 0.2s; font-family: inherit;
+  }
+  .diet-btn.active { background: rgba(46,125,50,0.1); border-color: rgba(46,125,50,0.3); color: var(--green); }
+
+  .dish-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-top: 20px; }
+  @media (min-width: 640px) { .dish-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (min-width: 900px) { .dish-grid { grid-template-columns: repeat(4,1fr); } }
+
+  .dish-card {
+    position: relative; border-radius: 18px; background: #fff; overflow: hidden;
+    border: 1px solid rgba(36,26,0,0.05); box-shadow: var(--card-shadow);
+    transition: all 0.25s;
+  }
+  .dish-card:hover { box-shadow: var(--card-shadow-hover); transform: translateY(-2px); }
+  .dish-card.sold-out { opacity: 0.6; }
+  .dish-img {
+    height: 120px; overflow: hidden; background: linear-gradient(135deg, #FFF3E0, #FFE8CC);
+  }
+  .dish-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dish-body { padding: 14px; }
+  .dish-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .dish-name-row { display: flex; align-items: center; gap: 6px; }
+  .veg-icon { width: 14px; height: 14px; border: 2px solid; border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .veg-icon.veg { border-color: var(--green); }
+  .veg-icon.nonveg { border-color: var(--red); }
+  .veg-icon span { width: 6px; height: 6px; border-radius: 50%; }
+  .veg-icon.veg span { background: var(--green); }
+  .veg-icon.nonveg span { background: var(--red); }
+  .dish-name { font-weight: 600; font-size: 13px; line-height: 1.3; }
+  .dish-rating { display: flex; align-items: center; gap: 3px; font-size: 11px; color: rgba(36,26,0,0.6); flex-shrink: 0; }
+  .dish-desc { font-size: 11px; color: rgba(36,26,0,0.5); margin-top: 6px; line-height: 1.5; }
+  .dish-tags { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+  .dish-tag { font-size: 9px; padding: 2px 8px; border-radius: 999px; background: rgba(36,26,0,0.05); color: rgba(36,26,0,0.6); }
+  .dish-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(36,26,0,0.05); }
+  .dish-price { font-weight: 700; font-size: 14px; }
+  .stock-badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 999px; display: inline-block; margin-top: 3px; }
+  .stock-available { background: rgba(46,125,50,0.1); color: var(--green); }
+  .stock-low { background: rgba(244,163,0,0.15); color: var(--amber-dark); }
+  .stock-sold { background: rgba(225,68,52,0.1); color: var(--red); }
+  .add-btn {
+    width: 34px; height: 34px; border-radius: 12px; background: var(--amber); color: var(--dark);
+    border: none; cursor: pointer; box-shadow: 0 3px 10px rgba(244,163,0,0.4);
+    font-size: 18px; font-weight: 700; transition: all 0.2s; flex-shrink: 0;
+  }
+  .add-btn:hover { transform: scale(1.1); }
+  .add-btn:disabled { background: rgba(36,26,0,0.1); color: rgba(36,26,0,0.3); box-shadow: none; cursor: not-allowed; transform: none; }
+  .ai-pick-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 5;
+    background: linear-gradient(90deg, rgba(244,163,0,0.9), rgba(225,68,52,0.75));
+    color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* CART DRAWER */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(36,26,0,0.4); z-index: 40;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+  .cart-drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 400px;
+    background: var(--bg); z-index: 50; box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+    transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column;
+  }
+  .cart-drawer.open { transform: translateX(0); }
+  .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(36,26,0,0.1); }
+  .cart-header h2 { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; }
+  .close-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: transparent; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+  .close-btn:hover { background: rgba(36,26,0,0.05); }
+  .cart-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .cart-empty { text-align: center; padding: 60px 0; color: rgba(36,26,0,0.4); }
+  .cart-item { display: flex; gap: 12px; align-items: center; }
+  .cart-item-img { width: 56px; height: 56px; border-radius: 14px; overflow: hidden; background: #FFF3E0; flex-shrink: 0; }
+  .cart-item-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cart-item-info { flex: 1; min-width: 0; }
+  .cart-item-name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cart-item-price { font-size: 11px; color: rgba(36,26,0,0.5); }
+  .qty-control { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 12px; border: 1px solid rgba(36,26,0,0.1); padding: 4px 6px; }
+  .qty-control button { width: 22px; height: 22px; border: none; background: transparent; cursor: pointer; color: rgba(36,26,0,0.6); font-size: 14px; }
+  .qty-val { font-size: 12px; font-weight: 600; width: 16px; text-align: center; }
+  .instructions-label { font-size: 11px; font-weight: 500; color: rgba(36,26,0,0.6); }
+  .instructions-input {
+    width: 100%; margin-top: 6px; padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(36,26,0,0.1);
+    background: #fff; font-size: 13px; font-family: inherit; resize: none; outline: none;
+  }
+  .cart-footer { padding: 20px; border-top: 1px solid rgba(36,26,0,0.1); background: rgba(255,255,255,0.5); }
+  .bill-row { display: flex; justify-content: space-between; font-size: 12px; color: rgba(36,26,0,0.6); margin-bottom: 6px; }
+  .bill-total { display: flex; justify-content: space-between; font-weight: 700; padding-top: 8px; border-top: 1px solid rgba(36,26,0,0.1); margin-top: 6px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px);
+    z-index: 60; background: var(--dark); color: var(--bg); font-size: 13px; font-weight: 500;
+    padding: 12px 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    display: flex; align-items: center; gap: 8px; opacity: 0; pointer-events: none; transition: all 0.3s;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+
+  .no-results { text-align: center; padding: 60px 0; color: rgba(36,26,0,0.4); font-size: 13px; }
+  .empty-msg { font-size: 13px; }
+
+  footer.site-footer { margin-top: 60px; border-top: 1px solid rgba(36,26,0,0.05); padding: 30px 0; text-align: center; font-size: 12px; color: rgba(36,26,0,0.4); }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* QR MENU CARD */
+  .qr-card {
+    background: #fff; border-radius: 22px; border: 1px solid rgba(36,26,0,0.06);
+    box-shadow: var(--card-shadow); padding: 22px; display: flex; align-items: center; gap: 18px;
+    margin: 16px 20px 0;
+  }
+  .qr-visual {
+    width: 88px; height: 88px; border-radius: 14px; flex-shrink: 0;
+    background:
+      repeating-linear-gradient(0deg, var(--dark) 0 6px, transparent 6px 12px),
+      repeating-linear-gradient(90deg, var(--dark) 0 6px, transparent 6px 12px);
+    background-blend-mode: multiply; background-color: #fff;
+    position: relative; padding: 6px; box-sizing: border-box;
+  }
+  .qr-visual::before, .qr-visual::after {
+    content: ''; position: absolute; width: 22px; height: 22px; border: 4px solid var(--dark); border-radius: 4px; background: #fff;
+  }
+  .qr-visual::before { top: 6px; left: 6px; }
+  .qr-visual::after { bottom: 6px; right: 6px; }
+  .qr-card-text h3 { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; }
+  .qr-card-text p { font-size: 12px; color: rgba(36,26,0,0.5); margin-top: 4px; line-height: 1.5; }
+  .qr-card-text .table-tag { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--amber-dark); background: rgba(244,163,0,0.12); padding: 3px 10px; border-radius: 999px; }
+
+  /* CHECKOUT */
+  .checkout-step { padding: 24px 20px 12px; }
+  .checkout-progress { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(36,26,0,0.15); transition: all 0.3s; }
+  .progress-dot.active { background: var(--amber); width: 20px; border-radius: 4px; }
+  .progress-dot.done { background: var(--green); }
+  .checkout-title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; }
+  .pay-options { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .pay-option {
+    display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px;
+    border: 1.5px solid rgba(36,26,0,0.1); background: #fff; cursor: pointer; transition: all 0.2s;
+  }
+  .pay-option.selected { border-color: var(--amber); background: rgba(244,163,0,0.06); }
+  .pay-option-icon { font-size: 20px; }
+  .pay-option-label { font-weight: 600; font-size: 13px; flex: 1; }
+  .pay-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(36,26,0,0.2); position: relative; }
+  .pay-option.selected .pay-radio { border-color: var(--amber); }
+  .pay-option.selected .pay-radio::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--amber); }
+  .order-summary-list { margin-top: 16px; border-top: 1px solid rgba(36,26,0,0.08); padding-top: 12px; }
+  .order-summary-row { display: flex; justify-content: space-between; font-size: 12.5px; padding: 4px 0; color: rgba(36,26,0,0.6); }
+  .confirm-screen { text-align: center; padding: 40px 20px; }
+  .confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(46,125,50,0.12); color: var(--green); font-size: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm-screen h2 { font-family: 'Sora', sans-serif; font-size: 19px; font-weight: 700; }
+  .confirm-screen p { font-size: 13px; color: rgba(36,26,0,0.5); margin-top: 6px; }
+  .confirm-order-id { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 700; background: rgba(36,26,0,0.06); padding: 5px 14px; border-radius: 999px; }
+  .tracker { display: flex; justify-content: space-between; margin-top: 28px; position: relative; padding: 0 8px; }
+  .tracker::before { content: ''; position: absolute; top: 14px; left: 24px; right: 24px; height: 2px; background: rgba(36,26,0,0.1); }
+  .tracker-step { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; z-index: 1; flex: 1; }
+  .tracker-dot { width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 2px solid rgba(36,26,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 12px; color: rgba(36,26,0,0.3); }
+  .tracker-step.done .tracker-dot { background: var(--green); border-color: var(--green); color: #fff; }
+  .tracker-label { font-size: 10px; color: rgba(36,26,0,0.4); font-weight: 600; }
+  .tracker-step.done .tracker-label { color: var(--green); }
+  .back-link { font-size: 12px; color: rgba(36,26,0,0.5); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-bottom: 8px; font-family: inherit; }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container navbar-inner">
+    <div class="logo">
+      <div class="logo-badge">SR</div>
+      <span class="logo-text">Saffron &amp; Root</span>
+    </div>
+    <div class="nav-actions">
+      <span class="table-chip">📍 Table 12</span>
+      <button class="icon-btn" aria-label="Notifications">🔔<span class="dot"></span></button>
+      <button class="icon-btn cart-btn" id="cartBtn" aria-label="Open cart">🛒<span class="cart-count" id="cartCount" style="display:none">0</span></button>
+    </div>
+  </div>
+  <div class="container tabs">
+    <button class="tab-btn active" data-page="home">Home</button>
+    <button class="tab-btn" data-page="menu">Menu</button>
+  </div>
+</header>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="badge badge-ai">✨ Now serving fresh, today</span>
+      <h1>Order what's actually in the kitchen.</h1>
+      <p>Live dish availability, no more asking the waiter twice. Scan, browse, and order straight from your table.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="goToMenu()">📷 Scan QR to Order</button>
+        <button class="btn-ghost" onclick="goToMenu()">Reserve a table</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qr-card">
+    <div class="qr-visual"></div>
+    <div class="qr-card-text">
+      <h3>Scan for the full digital menu</h3>
+      <p>Point your camera at this code to open the live menu, see real-time availability, and order without waiting for staff.</p>
+      <span class="table-tag">📍 Linked to Table 12</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="section-head">
+      <h2>✨ Recommended for You</h2>
+      <button class="link-btn" onclick="goToMenu()">See menu ›</button>
+    </div>
+    <div class="carousel" id="featuredCarousel"></div>
+  </section>
+
+  <div class="highlights">
+    <div class="highlight-card"><div class="highlight-icon">⏱</div><div><div class="highlight-title">Avg. 12 min</div><div class="highlight-sub">kitchen turnaround</div></div></div>
+    <div class="highlight-card"><div class="highlight-icon">🌱</div><div><div class="highlight-title">40% menu</div><div class="highlight-sub">vegan-friendly</div></div></div>
+    <div class="highlight-card"><div class="highlight-icon">⭐</div><div><div class="highlight-title">4.6 rated</div><div class="highlight-sub">by 2,300+ diners</div></div></div>
+  </div>
+</div>
+
+<!-- MENU PAGE -->
+<div class="page" id="page-menu">
+  <div class="menu-page">
+    <h1>Digital Menu</h1>
+    <div class="menu-controls">
+      <div class="search-row">
+        <div class="search-wrap">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="Search dishes..." oninput="renderMenu()">
+        </div>
+        <button class="filter-toggle" id="filterToggle" onclick="toggleFilters()">⚙</button>
+      </div>
+      <div class="category-tabs" id="categoryTabs"></div>
+      <div class="diet-filters" id="dietFilters" style="display:none"></div>
+    </div>
+    <div class="dish-grid" id="dishGrid"></div>
+    <div class="no-results" id="noResults" style="display:none">No dishes match your filters. Try clearing a few.</div>
+  </div>
+</div>
+
+<footer class="site-footer">Saffron &amp; Root · Smart Restaurant OS · Built for VibeAthon 6.0</footer>
+
+<!-- CART / CHECKOUT DRAWER -->
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2 id="drawerTitle">Your Cart</h2>
+    <button class="close-btn" onclick="closeCart()">✕</button>
+  </div>
+
+  <!-- STEP 1: CART -->
+  <div id="stepCart" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="bill-row"><span>Subtotal</span><span id="subtotalVal">₹0</span></div>
+      <div class="bill-row"><span>Tax (5%)</span><span id="taxVal">₹0</span></div>
+      <div class="bill-total"><span>Total</span><span id="totalVal">₹0</span></div>
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="goToCheckout()">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: PAYMENT -->
+  <div id="stepPayment" style="display:none;flex:1;flex-direction:column;overflow-y:auto">
+    <div class="checkout-step">
+      <button class="back-link" onclick="backToCart()">← Back to cart</button>
+      <div class="checkout-progress">
+        <div class="progress-dot done"></div><div class="progress-dot active"></div><div class="progress-dot"></div>
+      </div>
+      <div class="checkout-title">Choose payment method</div>
+      <div class="pay-options" id="payOptions">
+        <div class="pay-option selected" data-method="upi" onclick="selectPay('upi')">
+          <span class="pay-option-icon">📱</span><span class="pay-option-label">UPI / GPay / PhonePe</span><span class="pay-radio"></span>
+        </div>
+        <div class="pay-option" data-method="card" onclick="selectPay('card')">
+          <span class="pay-option-icon">💳</span><span class="pay-option-label">Credit / Debit Card</span><span class="pay-radio"></span>
+        </div>
+        <div class="pay-option" data-method="cash" onclick="selectPay('cash')">
+          <span class="pay-option-icon">💵</span><span class="pay-option-label">Pay at table (Cash)</span><span class="pay-radio"></span>
+        </div>
+      </div>
+      <div class="order-summary-list">
+        <div class="order-summary-row"><span>Items</span><span id="ck-items"></span></div>
+        <div class="order-summary-row"><span>Subtotal</span><span id="ck-subtotal"></span></div>
+        <div class="order-summary-row"><span>Tax (5%)</span><span id="ck-tax"></span></div>
+        <div class="order-summary-row" style="font-weight:700;color:var(--dark)"><span>Total to pay</span><span id="ck-total"></span></div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;margin-top:auto">
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="placeOrder()">Confirm & Pay</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: CONFIRMATION -->
+  <div id="stepConfirm" style="display:none;flex:1;flex-direction:column;overflow-y:auto">
+    <div class="confirm-screen">
+      <div class="confirm-icon">✓</div>
+      <h2>Order placed!</h2>
+      <p>The kitchen has received your order and is getting started.</p>
+      <span class="confirm-order-id" id="orderIdLabel">Order #—</span>
+      <div class="tracker">
+        <div class="tracker-step done"><div class="tracker-dot">✓</div><div class="tracker-label">Placed</div></div>
+        <div class="tracker-step"><div class="tracker-dot">2</div><div class="tracker-label">Preparing</div></div>
+        <div class="tracker-step"><div class="tracker-dot">3</div><div class="tracker-label">Ready</div></div>
+        <div class="tracker-step"><div class="tracker-dot">4</div><div class="tracker-label">Served</div></div>
+      </div>
+    </div>
+    <div style="padding:0 20px 20px">
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="closeCartFully()">Continue browsing</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
+
+<script>
+// ---------------- MOCK DATA ----------------
+const DISHES = [
+  { id: 1, name: "Butter Chicken", category: "Mains", price: 420, veg: false, rating: 4.7, stock: 8, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmqYZioDKBrqkLMt3lNTjNu_hbL2m6C4A42JfvrEt_bA&s=10", tags: ["Spicy"], desc: "Slow-simmered tomato gravy, char-grilled chicken, a spoon of cream at the end." },
+  { id: 2, name: "Paneer Tikka Masala", category: "Mains", price: 360, veg: true, rating: 4.6, stock: 3,image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB3oCzX3rNTCyQzUqkOws5OttwGNoTW3GoDJkfQ0gJkg&s=10", tags: ["Spicy", "Gluten-Free"], desc: "Smoky paneer cubes in a cashew-tomato masala." },
+  { id: 3, name: "Truffle Mushroom Risotto", category: "Mains", price: 480, veg: true, rating: 4.8, stock: 0, image: "https://loremflickr.com/400/300/risotto,mushroom?lock=103", tags: ["Vegan"], desc: "Arborio rice, wild mushrooms, black truffle oil, aged parmesan." },
+  { id: 4, name: "Tandoori Prawns", category: "Starters", price: 390, veg: false, rating: 4.5, stock: 12, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLjhEudR95Db3MNXlXtBwlLw-x1oL-M6GrgIkSWQOHU9Jhg7Iz68J-R2Rm&s=10", tags: ["Spicy", "Gluten-Free"], desc: "Char-grilled tiger prawns marinated overnight in yoghurt and spice." },
+  { id: 5, name: "Crispy Corn Chaat", category: "Starters", price: 210, veg: true, rating: 4.3, stock: 20, image: "data:image/jpeg;base64,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", tags: ["Vegan", "Gluten-Free"], desc: "Fried corn tossed with tangy chutneys and pomegranate." },
+  { id: 6, name: "Hara Bhara Kebab", category: "Starters", price: 240, veg: true, rating: 4.4, stock: 2, image: "https://loremflickr.com/400/300/kebab,vegetarian?lock=106", tags: ["Vegan"], desc: "Spinach and pea patties, mint chutney, pickled onion." },
+  { id: 7, name: "Belgian Chocolate Fondant", category: "Desserts", price: 260, veg: true, rating: 4.9, stock: 6, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvRb0pzXbS6Qo26G-PI1xDuSOew9LHZgCwqvFWyqM9Gw&s", tags: ["Nut-Free"], desc: "Molten centre, vanilla bean ice cream, gold leaf." },
+  { id: 8, name: "Saffron Rasmalai", category: "Desserts", price: 190, veg: true, rating: 4.6, stock: 15, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeJLw-ClL3tzXqldM7-j9RSewlypSwLAetOk-w9jm59Q&s=10", tags: ["Gluten-Free", "Nut-Free"], desc: "House-made paneer discs in saffron-cardamom milk." },
+  { id: 9, name: "Watermelon Mint Cooler", category: "Drinks", price: 150, veg: true, rating: 4.2, stock: 25, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgQGwyZg4yUg5EK4r9usMK0c56iWlPp81QSvYHprYW7w&s=10", tags: ["Vegan", "Gluten-Free"], desc: "Fresh watermelon, mint, lime, a whisper of chaat masala." },
+  { id: 10, name: "Masala Chai", category: "Drinks", price: 90, veg: true, rating: 4.7, stock: 30, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9iI0lZMgjd5O_R-0lAyY-UgLvRmz9M66i42y9Jz7I3g&s=10", tags: ["Vegan"], desc: "Slow-brewed with whole spices, jaggery, and Assam leaf." },
+
+  { id: 11, name: "Chicken Biryani", category: "Mains", price: 380, veg: false, rating: 4.8, stock: 10, image: "https://loremflickr.com/400/300/biryani,chicken?lock=111", tags: ["Spicy"], desc: "Long-grain basmati layered with slow-cooked chicken, saffron, and fried onions." },
+  { id: 12, name: "Palak Paneer", category: "Mains", price: 320, veg: true, rating: 4.5, stock: 9, image: "https://loremflickr.com/400/300/palak-paneer,spinach?lock=112", tags: ["Gluten-Free"], desc: "Fresh spinach purée simmered with soft paneer cubes and garlic tempering." },
+  { id: 13, name: "Mutton Rogan Josh", category: "Mains", price: 520, veg: false, rating: 4.7, stock: 4, image: "https://loremflickr.com/400/300/mutton,curry?lock=113", tags: ["Spicy", "Gluten-Free"], desc: "Kashmiri-style slow-braised mutton in a rich, aromatic red gravy." },
+  { id: 14, name: "Vegetable Dum Biryani", category: "Mains", price: 300, veg: true, rating: 4.4, stock: 14, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQENpGvm_Y-G77KwqyOdgI6FC6pfoOTZSSRKw6duo3dsQ&s=10", tags: ["Vegan", "Spicy"], desc: "Seasonal vegetables and basmati rice, slow-cooked in a sealed handi." },
+  { id: 15, name: "Chicken Seekh Kebab", category: "Starters", price: 310, veg: false, rating: 4.6, stock: 7, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVLG-rgeztKSuVooC5u9WEx6kde6sgmo5ddiKQFIXlzg&s=10", tags: ["Spicy", "Gluten-Free"], desc: "Minced chicken skewers, char-grilled with ginger, garlic, and garam masala." },
+  { id: 16, name: "Paneer 65", category: "Starters", price: 260, veg:true ,rating: 4.3,stock:10,image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqMnhP0V4qBDVntup8n8GuqUqXK3qHGc2GZ6PDMmXn1g&s=10", tags: ["Spicy"], desc: "Crispy fried paneer tossed in a tangy South Indian style chilli glaze." },
+  { id: 17, name: "Samosa Chaat", category: "Starters", price: 180, veg: true, rating: 4.5, stock: 0, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnFQajXmf4JMYpII6ODDALYwHJe-YxSo-DX893TL2UHQ&s=10", tags: ["Vegan"], desc: "Crushed samosas topped with yoghurt, tamarind chutney, and sev." },
+  { id: 18, name: "Gulab Jamun", category: "Desserts", price: 150, veg: true, rating: 4.8, stock: 18, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFJ0g7olF76WAujYglhd6bBLtRjXoT1zx8PQ98ZqGWXw&s=10", tags: ["Nut-Free"], desc: "Soft milk-solid dumplings soaked in warm cardamom-rose syrup." },
+  { id: 19, name: "Mango Kulfi", category: "Desserts", price: 170, veg: true, rating: 4.6, stock: 9, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBvyoNQ7j3TK9WaYUO-VBjA9heypycXM8FxeMtNFK_Wg&s=10", tags: ["Gluten-Free", "Nut-Free"], desc: "Dense, creamy frozen mango dessert on a stick, no added air." },
+  { id: 20, name: "Mango Lassi", category: "Drinks", price: 130, veg: true, rating: 4.7, stock: 22, image: "https://loremflickr.com/400/300/mango-lassi,yogurt?lock=120", tags: ["Vegan", "Gluten-Free"], desc: "Chilled yoghurt blended with ripe Alphonso mango pulp." },
+  { id: 21, name: "Virgin Mojito", category: "Drinks", price: 160, veg: true, rating: 4.4, stock: 16, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp-srXZ7eXoixzkg8LKW9EUt-JLPLGSAqczNhRfJtIIw&s=10", tags: ["Vegan", "Gluten-Free"], desc: "Fresh lime, mint, and soda over crushed ice — sharp and refreshing." },
+];
+const CATEGORIES = ["All", "Starters", "Mains", "Desserts", "Drinks"];
+const DIET_FILTERS = ["Vegan", "Gluten-Free", "Nut-Free", "Spicy"];
+const AI_PICKS = [1, 4, 7];
+
+let cart = {}; // id -> qty
+let activeCategory = "All";
+let activeDiets = [];
+let filtersOpen = false;
+
+// ---------------- HELPERS ----------------
+function stockBadge(stock) {
+  if (stock === 0) return `<span class="stock-badge stock-sold">Sold Out</span>`;
+  if (stock <= 3) return `<span class="stock-badge stock-low">Only ${stock} left</span>`;
+  return `<span class="stock-badge stock-available">Available</span>`;
+}
+
+function dishCardHTML(d, aiPick) {
+  const soldOut = d.stock === 0;
+  return `
+    <div class="dish-card ${soldOut ? 'sold-out' : ''}">
+      ${aiPick ? `<div class="ai-pick-badge">✨ AI Picked</div>` : ''}
+      <div class="dish-img"><img src="${d.image}" alt="${d.name}" loading="lazy" onerror="this.src='https://loremflickr.com/400/300/food?lock=${d.id}'"></div>
+      <div class="dish-body">
+        <div class="dish-top">
+          <div class="dish-name-row">
+            <span class="veg-icon ${d.veg ? 'veg' : 'nonveg'}"><span></span></span>
+            <span class="dish-name">${d.name}</span>
+          </div>
+          <span class="dish-rating">⭐ ${d.rating}</span>
+        </div>
+        <div class="dish-desc">${d.desc}</div>
+        <div class="dish-tags">${d.tags.map(t => `<span class="dish-tag">${t}</span>`).join('')}</div>
+        <div class="dish-footer">
+          <div>
+            <div class="dish-price">₹${d.price}</div>
+            ${stockBadge(d.stock)}
+          </div>
+          <button class="add-btn" ${soldOut ? 'disabled' : ''} onclick="addToCart(${d.id})">+</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ---------------- RENDER: HOME ----------------
+function renderFeatured() {
+  const el = document.getElementById('featuredCarousel');
+  el.innerHTML = DISHES.filter(d => AI_PICKS.includes(d.id)).map(d => dishCardHTML(d, true)).join('');
+}
+
+// ---------------- RENDER: MENU ----------------
+function renderCategoryTabs() {
+  const el = document.getElementById('categoryTabs');
+  el.innerHTML = CATEGORIES.map(c =>
+    `<button class="cat-btn ${c === activeCategory ? 'active' : ''}" onclick="setCategory('${c}')">${c}</button>`
+  ).join('');
+}
+function renderDietFilters() {
+  const el = document.getElementById('dietFilters');
+  el.innerHTML = DIET_FILTERS.map(k =>
+    `<button class="diet-btn ${activeDiets.includes(k) ? 'active' : ''}" onclick="toggleDiet('${k}')">${k}</button>`
+  ).join('');
+}
+function setCategory(c) { activeCategory = c; renderCategoryTabs(); renderMenu(); }
+function toggleDiet(k) {
+  activeDiets = activeDiets.includes(k) ? activeDiets.filter(d => d !== k) : [...activeDiets, k];
+  renderDietFilters(); renderMenu();
+}
+function toggleFilters() {
+  filtersOpen = !filtersOpen;
+  document.getElementById('dietFilters').style.display = filtersOpen ? 'flex' : 'none';
+  document.getElementById('filterToggle').classList.toggle('active', filtersOpen);
+}
+function renderMenu() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = DISHES.filter(d => {
+    if (activeCategory !== "All" && d.category !== activeCategory) return false;
+    if (query && !d.name.toLowerCase().includes(query)) return false;
+    if (activeDiets.length && !activeDiets.every(t => d.tags.includes(t))) return false;
+    return true;
+  });
+  const grid = document.getElementById('dishGrid');
+  const noResults = document.getElementById('noResults');
+  if (filtered.length === 0) {
+    grid.innerHTML = ''; noResults.style.display = 'block';
+  } else {
+    noResults.style.display = 'none';
+    grid.innerHTML = filtered.map(d => dishCardHTML(d, AI_PICKS.includes(d.id))).join('');
+  }
+}
+
+// ---------------- CART ----------------
+function addToCart(id) {
+  cart[id] = (cart[id] || 0) + 1;
+  updateCartUI();
+  const dish = DISHES.find(d => d.id === id);
+  showToast(`${dish.name} added to cart`);
+}
+function updateQty(id, qty) {
+  if (qty <= 0) delete cart[id]; else cart[id] = qty;
+  updateCartUI();
+}
+function cartCount() { return Object.values(cart).reduce((a,b) => a+b, 0); }
+function updateCartUI() {
+  const count = cartCount();
+  const countEl = document.getElementById('cartCount');
+  countEl.style.display = count > 0 ? 'flex' : 'none';
+  countEl.textContent = count;
+
+  const body = document.getElementById('cartBody');
+  const footer = document.getElementById('cartFooter');
+  const ids = Object.keys(cart);
+  if (ids.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><div style="font-size:32px;margin-bottom:10px;opacity:0.4">🛒</div><div class="empty-msg">Your cart is empty. Add a dish to get started.</div></div>`;
+    footer.style.display = 'none';
+    return;
+  }
+  footer.style.display = 'block';
+  let subtotal = 0;
+  body.innerHTML = ids.map(id => {
+    const d = DISHES.find(x => x.id == id);
+    const qty = cart[id];
+    subtotal += d.price * qty;
+    return `
+      <div class="cart-item">
+        <div class="cart-item-img"><img src="${d.image}" alt="${d.name}" onerror="this.src='https://loremflickr.com/100/100/food?lock=${d.id}'"></div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${d.name}</div>
+          <div class="cart-item-price">₹${d.price}</div>
+        </div>
+        <div class="qty-control">
+          <button onclick="updateQty(${id}, ${qty - 1})">−</button>
+          <span class="qty-val">${qty}</span>
+          <button onclick="updateQty(${id}, ${qty + 1})">+</button>
+        </div>
+      </div>`;
+  }).join('') + `
+    <div>
+      <div class="instructions-label">Special instructions</div>
+      <textarea class="instructions-input" rows="2" placeholder="E.g. less spicy, no onions..."></textarea>
+    </div>`;
+
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + tax;
+  document.getElementById('subtotalVal').textContent = `₹${subtotal}`;
+  document.getElementById('taxVal').textContent = `₹${tax}`;
+  document.getElementById('totalVal').textContent = `₹${total}`;
+}
+let selectedPayMethod = "upi";
+
+function openCart() {
+  showStep('cart');
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeCart() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function closeCartFully() {
+  closeCart();
+  setTimeout(() => showStep('cart'), 300);
+}
+
+function showStep(step) {
+  const titles = { cart: "Your Cart", payment: "Checkout", confirm: "Order Confirmed" };
+  document.getElementById('drawerTitle').textContent = titles[step];
+  document.getElementById('stepCart').style.display = step === 'cart' ? 'flex' : 'none';
+  document.getElementById('stepPayment').style.display = step === 'payment' ? 'flex' : 'none';
+  document.getElementById('stepConfirm').style.display = step === 'confirm' ? 'flex' : 'none';
+}
+
+function goToCheckout() {
+  const ids = Object.keys(cart);
+  if (ids.length === 0) return;
+  let subtotal = 0, itemCount = 0;
+  ids.forEach(id => {
+    const d = DISHES.find(x => x.id == id);
+    subtotal += d.price * cart[id];
+    itemCount += cart[id];
+  });
+  const tax = Math.round(subtotal * 0.05);
+  const total = subtotal + tax;
+  document.getElementById('ck-items').textContent = `${itemCount} item${itemCount > 1 ? 's' : ''}`;
+  document.getElementById('ck-subtotal').textContent = `₹${subtotal}`;
+  document.getElementById('ck-tax').textContent = `₹${tax}`;
+  document.getElementById('ck-total').textContent = `₹${total}`;
+  showStep('payment');
+}
+function backToCart() { showStep('cart'); }
+
+function selectPay(method) {
+  selectedPayMethod = method;
+  document.querySelectorAll('.pay-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.method === method);
+  });
+}
+
+function placeOrder() {
+  const orderId = 'SR-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('orderIdLabel').textContent = `Order #${orderId}`;
+  showStep('confirm');
+  cart = {};
+  updateCartUI();
+}
+
+// ---------------- TOAST ----------------
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ---------------- NAVIGATION ----------------
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goToMenu() { showPage('menu'); }
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+document.getElementById('cartBtn').addEventListener('click', openCart);
+
+// ---------------- INIT ----------------
+renderFeatured();
+renderCategoryTabs();
+renderDietFilters();
+renderMenu();
+updateCartUI();
+</script>
+</body>
+</html>
